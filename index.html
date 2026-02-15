@@ -4,102 +4,79 @@
   <title>Voucher Store</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-  body {
-    font-family: 'Segoe UI', sans-serif;
-    background: radial-gradient(circle at top, #1a002e, #000);
-    padding: 20px;
-    color: white;
-  }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: radial-gradient(circle at top, #1a002e, #000);
+      padding: 20px;
+      color: white;
+    }
 
-  .card {
-    background: rgba(20, 0, 40, 0.85);
-    padding: 25px;
-    border-radius: 20px;
-    max-width: 420px;
-    margin: 20px auto;
-    text-align: center;
-    box-shadow: 0 0 25px #ff00ff, 0 0 50px #00ffff;
-    border: 2px solid #ff00ff;
-  }
+    .card {
+      background: rgba(20, 0, 40, 0.85);
+      padding: 25px;
+      border-radius: 20px;
+      max-width: 420px;
+      margin: 20px auto;
+      text-align: center;
+      box-shadow: 0 0 25px #ff00ff, 0 0 50px #00ffff;
+      border: 2px solid #ff00ff;
+    }
 
-  h2 {
-    color: #ff00ff;
-    text-shadow: 0 0 10px #ff00ff, 0 0 20px #00ffff;
-    font-size: 24px;
-  }
+    h2 { color: #ff00ff; text-shadow: 0 0 10px #ff00ff, 0 0 20px #00ffff; font-size: 24px; }
+    h3 { color: #00ffff; text-shadow: 0 0 8px #00ffff; }
 
-  h3 {
-    color: #00ffff;
-    text-shadow: 0 0 8px #00ffff;
-  }
+    button {
+      padding: 16px 24px;
+      margin-top: 12px;
+      border-radius: 14px;
+      border: none;
+      background: linear-gradient(45deg, #ff00ff, #00ffff);
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 18px;
+      box-shadow: 0 0 15px #ff00ff, 0 0 25px #00ffff;
+      transition: 0.3s;
+      width: 100%;
+      max-width: 320px;
+    }
 
-  button {
-    padding: 16px 24px;
-    margin-top: 12px;
-    border-radius: 14px;
-    border: none;
-    background: linear-gradient(45deg, #ff00ff, #00ffff);
-    color: white;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 18px;
-    box-shadow: 0 0 15px #ff00ff, 0 0 25px #00ffff;
-    transition: 0.3s;
-    width: 100%; /* full-width for mobile taps */
-    max-width: 320px;
-  }
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 25px #00ffff, 0 0 35px #ff00ff;
+    }
 
-  button:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 25px #00ffff, 0 0 35px #ff00ff;
-  }
+    .secondary-btn { background: linear-gradient(45deg, #ff0080, #ff4dff); }
 
-  .secondary-btn {
-    background: linear-gradient(45deg, #ff0080, #ff4dff);
-  }
+    input {
+      width: 95%;
+      padding: 14px;
+      margin: 10px 0;
+      border-radius: 12px;
+      border: 1px solid #00ffff;
+      background: #140028;
+      color: white;
+      outline: none;
+      box-shadow: 0 0 12px #00ffff;
+      font-size: 16px;
+    }
 
-  input {
-    width: 95%;
-    padding: 14px;
-    margin: 10px 0;
-    border-radius: 12px;
-    border: 1px solid #00ffff;
-    background: #140028;
-    color: white;
-    outline: none;
-    box-shadow: 0 0 12px #00ffff;
-    font-size: 16px;
-  }
+    input::placeholder { color: #bbb; }
+    hr { margin: 20px 0; border: 1px solid #ff00ff; box-shadow: 0 0 10px #ff00ff; }
 
-  input::placeholder {
-    color: #bbb;
-  }
+    .order-box {
+      border: 1px solid #00ffff;
+      padding: 15px;
+      margin: 12px 0;
+      border-radius: 15px;
+      box-shadow: 0 0 12px #00ffff;
+      font-size: 16px;
+    }
 
-  hr {
-    margin: 20px 0;
-    border: 1px solid #ff00ff;
-    box-shadow: 0 0 10px #ff00ff;
-  }
-
-  .order-box {
-    border: 1px solid #00ffff;
-    padding: 15px;
-    margin: 12px 0;
-    border-radius: 15px;
-    box-shadow: 0 0 12px #00ffff;
-    font-size: 16px;
-  }
-
-  /* Optional: make images responsive */
-  img {
-    max-width: 100%;
-    height: auto;
-  }
-</style>
-
+    img { max-width: 100%; height: auto; }
+  </style>
 </head>
 <body>
-
 <div id="app"></div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -115,7 +92,6 @@ const firebaseConfig = {
   messagingSenderId: "411976248798",
   appId: "1:411976248798:web:e7dc194853cefc7e2f814f"
 };
-
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
@@ -134,7 +110,7 @@ function showHomepage() {
 
 /* ================= BUY ================= */
 function showBuyPage() {
-  db.ref('voucherInventory').once('value').then(snapshot=>{
+  db.ref('vouchers').once('value').then(snapshot=>{
     const inventory = snapshot.val() || {};
     const stock70 = inventory['70_percent'] ? Object.keys(inventory['70_percent']).length : 0;
     const stock73 = inventory['73_percent'] ? Object.keys(inventory['73_percent']).length : 0;
@@ -154,11 +130,9 @@ function showBuyPage() {
         <h3>Total: ₱<span id="totalAmount">0</span></h3>
 
         <p><strong>Scan to Pay via GCash</strong></p>
-
         <img src="https://i.imgur.com/PquwwgW.jpeg"
              alt="GCash QR Code"
              style="width:220px; margin:10px 0; border-radius:12px;">
-
         <p style="font-size:14px;">
           Please send the exact total amount shown above.
         </p>
@@ -174,6 +148,12 @@ function showBuyPage() {
   });
 }
 
+function calculateTotal() {
+  const qty70 = parseInt(document.getElementById("qty70").value) || 0;
+  const qty73 = parseInt(document.getElementById("qty73").value) || 0;
+  const total = qty70 * 25 + qty73 * 35;
+  document.getElementById("totalAmount").innerText = total;
+}
 
 function submitOrder(){
   const qty70 = parseInt(document.getElementById("qty70").value) || 0;
@@ -184,7 +164,6 @@ function submitOrder(){
   if(reference.length < 6) return alert("Invalid reference.");
 
   const orderRef = db.ref('orders').push();
-
   orderRef.set({
     qty70,
     qty73,
@@ -233,7 +212,6 @@ function adminLogin(){
 function showAdminDashboard(){
   db.ref('orders').once('value').then(orderSnap=>{
     const orders = orderSnap.val() || {};
-
     let html = `
       <div class="card">
         <h2>Admin Panel</h2>
@@ -242,7 +220,6 @@ function showAdminDashboard(){
         <button onclick="showArchivedOrders()">📂 View Archived Orders</button>
 
         <hr>
-
         <h3>Stock Voucher Codes</h3>
         <input type="text" id="stock70" placeholder="Add 70% codes (comma separated)">
         <button onclick="stockCodes('70_percent')">Add 70%</button>
@@ -293,7 +270,7 @@ function stockCodes(type){
   const codes = raw.split(",").map(c=>c.trim()).filter(c=>c);
   const updates = {};
   codes.forEach(code=>{
-    updates['voucherInventory/'+type+'/'+code] = true;
+    updates['vouchers/'+type+'/'+code] = true;
   });
 
   db.ref().update(updates).then(()=>{
@@ -304,7 +281,7 @@ function stockCodes(type){
 
 /* ================= CONFIRM ORDER ================= */
 function confirmOrder(id, qty70, qty73){
-  db.ref('voucherInventory').once('value').then(snapshot=>{
+  db.ref('vouchers').once('value').then(snapshot=>{
     const inventory = snapshot.val() || {};
 
     const available70 = inventory['70_percent'] ? Object.keys(inventory['70_percent']) : [];
@@ -326,11 +303,11 @@ function confirmOrder(id, qty70, qty73){
     };
 
     assigned70.forEach(code=>{
-      updates['voucherInventory/70_percent/'+code] = null;
+      updates['vouchers/70_percent/'+code] = null;
     });
 
     assigned73.forEach(code=>{
-      updates['voucherInventory/73_percent/'+code] = null;
+      updates['vouchers/73_percent/'+code] = null;
     });
 
     db.ref().update(updates).then(()=>{
@@ -340,7 +317,8 @@ function confirmOrder(id, qty70, qty73){
   });
 }
 
-  function archiveConfirmed(){
+/* ================= ARCHIVE ================= */
+function archiveConfirmed(){
   db.ref('orders').once('value').then(snapshot=>{
     const orders = snapshot.val() || {};
     const updates = {};
@@ -358,14 +336,11 @@ function confirmOrder(id, qty70, qty73){
     });
   });
 }
+
 function showArchivedOrders(){
   db.ref('archivedOrders').once('value').then(snapshot=>{
     const orders = snapshot.val() || {};
-
-    let html = `
-      <div class="card">
-        <h2>Archived Orders</h2>
-    `;
+    let html = `<div class="card"><h2>Archived Orders</h2>`;
 
     for(const id in orders){
       const o = orders[id];
@@ -378,11 +353,7 @@ function showArchivedOrders(){
       `;
     }
 
-    html += `
-        <button onclick="showAdminDashboard()">Back</button>
-      </div>
-    `;
-
+    html += `<button onclick="showAdminDashboard()">Back</button></div>`;
     document.getElementById("app").innerHTML = html;
   });
 }
@@ -393,14 +364,6 @@ function deleteArchived(id){
     showArchivedOrders();
   });
 }
-
-  function deleteArchived(id){
-  db.ref('archivedOrders/' + id).remove().then(()=>{
-    alert("Archived order deleted permanently.");
-    showArchivedOrders();
-  });
-}
-
 
 /* ================= CHECK ORDER ================= */
 function showMyOrder(){
@@ -434,5 +397,3 @@ showHomepage();
 </script>
 </body>
 </html>
-
-

@@ -141,24 +141,26 @@ function showBuyPage() {
 
     document.getElementById("app").innerHTML = `
       <div class="card">
-        <h2>Buy Vouchers</h2>
+        <h2>💖 Buy Vouchers 💖</h2>
 
-        <p><strong>70% Voucher</strong><br>Available: ${stock70}</p>
-        <input type="number" id="qty70" placeholder="Quantity for 70%">
+        <p><strong>70% Voucher - ₱25</strong><br>Available: ${stock70}</p>
+        <input type="number" id="qty70" placeholder="Quantity for 70%" min="0" oninput="calculateTotal()">
 
-        <p><strong>73% Voucher</strong><br>Available: ${stock73}</p>
-        <input type="number" id="qty73" placeholder="Quantity for 73%">
+        <p><strong>73% Voucher - ₱35</strong><br>Available: ${stock73}</p>
+        <input type="number" id="qty73" placeholder="Quantity for 73%" min="0" oninput="calculateTotal()">
 
         <hr>
+
+        <h3>Total: ₱<span id="totalAmount">0</span></h3>
 
         <p><strong>Scan to Pay via GCash</strong></p>
 
         <img src="https://i.imgur.com/PquwwgW.jpeg"
              alt="GCash QR Code"
-             style="width:220px; margin:10px 0; border-radius:12px; box-shadow:0 5px 15px rgba(0,0,0,0.2);">
+             style="width:220px; margin:10px 0; border-radius:12px;">
 
-        <p style="font-size:14px; color:#555;">
-          Send the exact amount based on your order.
+        <p style="font-size:14px;">
+          Please send the exact total amount shown above.
         </p>
 
         <input type="text" id="reference" placeholder="Enter GCash Reference Number">
@@ -235,6 +237,11 @@ function showAdminDashboard(){
     let html = `
       <div class="card">
         <h2>Admin Panel</h2>
+
+        <button onclick="archiveConfirmed()">📦 Archive Confirmed Orders</button>
+        <button onclick="showArchivedOrders()">📂 View Archived Orders</button>
+
+        <hr>
 
         <h3>Stock Voucher Codes</h3>
         <input type="text" id="stock70" placeholder="Add 70% codes (comma separated)">
@@ -333,6 +340,68 @@ function confirmOrder(id, qty70, qty73){
   });
 }
 
+  function archiveConfirmed(){
+  db.ref('orders').once('value').then(snapshot=>{
+    const orders = snapshot.val() || {};
+    const updates = {};
+
+    for(const id in orders){
+      if(orders[id].status === "confirmed"){
+        updates['archivedOrders/' + id] = orders[id];
+        updates['orders/' + id] = null;
+      }
+    }
+
+    db.ref().update(updates).then(()=>{
+      alert("Confirmed orders archived.");
+      showAdminDashboard();
+    });
+  });
+}
+function showArchivedOrders(){
+  db.ref('archivedOrders').once('value').then(snapshot=>{
+    const orders = snapshot.val() || {};
+
+    let html = `
+      <div class="card">
+        <h2>Archived Orders</h2>
+    `;
+
+    for(const id in orders){
+      const o = orders[id];
+      html += `
+        <div class="order-box">
+          <p><b>ID:</b> ${id}</p>
+          <p>Status: ${o.status}</p>
+          <button onclick="deleteArchived('${id}')">Delete Permanently</button>
+        </div>
+      `;
+    }
+
+    html += `
+        <button onclick="showAdminDashboard()">Back</button>
+      </div>
+    `;
+
+    document.getElementById("app").innerHTML = html;
+  });
+}
+
+function deleteArchived(id){
+  db.ref('archivedOrders/' + id).remove().then(()=>{
+    alert("Archived order deleted permanently.");
+    showArchivedOrders();
+  });
+}
+
+  function deleteArchived(id){
+  db.ref('archivedOrders/' + id).remove().then(()=>{
+    alert("Archived order deleted permanently.");
+    showArchivedOrders();
+  });
+}
+
+
 /* ================= CHECK ORDER ================= */
 function showMyOrder(){
   const reference = prompt("Enter reference:");
@@ -365,4 +434,5 @@ showHomepage();
 </script>
 </body>
 </html>
+
 
